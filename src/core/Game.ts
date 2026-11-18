@@ -37,6 +37,14 @@ export class Game {
     return this.human.field.placeShip(length, start, orientation) !== null;
   }
 
+  /** Takes one of the human's ships back off the board. Only works in SETUP. */
+  public removeHumanShip(coord: Coordinate): boolean {
+    if (this.state !== GameState.Setup || !this.human.field.isInBounds(coord)) {
+      return false;
+    }
+    return this.human.field.removeShipAt(coord);
+  }
+
   /** Replaces the human's layout with a random full fleet. Only works in SETUP. */
   public randomizeHumanFleet(): void {
     if (this.state === GameState.Setup) {

@@ -34,7 +34,7 @@ export class Ship {
   /** True if this ship covers the given cell. */
   public occupies(coord: Coordinate): boolean {
     return this.getCoordinates().some(
-      (cell) => cell.row === coord.row && cell.col === coord.col,
+      (cell: Coordinate): boolean => cell.row === coord.row && cell.col === coord.col,
     );
   }
 

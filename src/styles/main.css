@@ -1,0 +1,279 @@
+:root {
+  --page: #eef3f8;
+  --panel: #ffffff;
+  --ink: #17263a;
+  --ink-soft: #55657a;
+  --line: #b9c8d8;
+  --water: #dcebf7;
+  --water-hover: #c3dcf0;
+  --ship: #3d5a80;
+  --hit: #e76f51;
+  --sunk: #9b2226;
+  --miss-dot: #6c8299;
+  --accent: #1d4e89;
+  --accent-ink: #ffffff;
+  --valid: #74c69d;
+  --invalid: #f28482;
+  --last: #f4a261;
+  --cell: clamp(24px, 7.6vw, 36px);
+
+  font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: var(--ink);
+  background: var(--page);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--page);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+#app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  text-align: center;
+}
+
+.title {
+  margin: 0 0 12px;
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+}
+
+.status {
+  display: inline-block;
+  margin: 0;
+  padding: 10px 18px;
+  border-radius: 8px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.status--win {
+  background: #d8f3dc;
+  border-color: #52b788;
+}
+
+.status--lose {
+  background: #fde2e0;
+  border-color: var(--hit);
+}
+
+.message {
+  min-height: 1.5em;
+  margin: 10px 0;
+  color: var(--ink-soft);
+}
+
+/* --- Boards --- */
+
+.boards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px 40px;
+  margin-top: 16px;
+}
+
+.board__title {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.board__grid {
+  display: grid;
+  grid-template-columns: repeat(11, var(--cell));
+  grid-template-rows: repeat(11, var(--cell));
+}
+
+.board__label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.board__counter {
+  min-height: 1.4em;
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.cell {
+  position: relative;
+  width: var(--cell);
+  height: var(--cell);
+  padding: 0;
+  margin: 0 -1px -1px 0;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--water);
+  cursor: default;
+}
+
+.cell:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+.cell--ship {
+  background: var(--ship);
+}
+
+.cell--miss::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 22%;
+  height: 22%;
+  border-radius: 50%;
+  background: var(--miss-dot);
+}
+
+.cell--hit,
+.cell--sunk {
+  background: var(--hit);
+}
+
+.cell--sunk {
+  background: var(--sunk);
+}
+
+.cell--hit::before,
+.cell--hit::after,
+.cell--sunk::before,
+.cell--sunk::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 70%;
+  height: 2px;
+  background: #ffffff;
+  transform: rotate(45deg);
+}
+
+.cell--hit::after,
+.cell--sunk::after {
+  transform: rotate(-45deg);
+}
+
+.cell--target {
+  cursor: crosshair;
+}
+
+.cell--target:hover {
+  background: var(--water-hover);
+}
+
+.cell--last {
+  box-shadow: inset 0 0 0 3px var(--last);
+  z-index: 1;
+}
+
+.cell--preview-valid {
+  background: var(--valid);
+}
+
+.cell--preview-invalid {
+  background: var(--invalid);
+}
+
+[data-state='SETUP'] .board--human .cell {
+  cursor: pointer;
+}
+
+[data-state='SETUP'] .board--bot {
+  opacity: 0.45;
+}
+
+/* --- Setup panel and buttons --- */
+
+.setup {
+  max-width: 640px;
+  margin: 16px auto 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+}
+
+.setup__title {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+}
+
+.setup__hint {
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.setup__ships,
+.setup__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.setup__ships {
+  margin-bottom: 12px;
+}
+
+.setup__done {
+  margin: 6px 0;
+  font-weight: 600;
+}
+
+.button {
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.ship-option--selected {
+  background: var(--ship);
+  border-color: var(--ship);
+  color: #ffffff;
+}

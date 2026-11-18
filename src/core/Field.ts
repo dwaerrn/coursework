@@ -10,7 +10,7 @@ export class Field {
   private readonly ships: Ship[] = [];
 
   public constructor() {
-    this.grid = Array.from({ length: Field.SIZE }, () =>
+    this.grid = Array.from({ length: Field.SIZE }, (): CellState[] =>
       new Array<CellState>(Field.SIZE).fill(CellState.Empty),
     );
   }
@@ -33,6 +33,22 @@ export class Field {
     }
     this.ships.push(ship);
     return ship;
+  }
+
+  /**
+   * Removes the ship covering the given cell (used while arranging the fleet).
+   * Returns false if there is no ship there or it has already been hit.
+   */
+  public removeShipAt(coord: Coordinate): boolean {
+    const ship = this.findShipAt(coord);
+    if (ship === undefined || ship.getHits() > 0) {
+      return false;
+    }
+    for (const cell of ship.getCoordinates()) {
+      this.grid[cell.row][cell.col] = CellState.Empty;
+    }
+    this.ships.splice(this.ships.indexOf(ship), 1);
+    return true;
   }
 
   /** Clears the board and places the whole classic fleet at random. */
@@ -104,7 +120,7 @@ export class Field {
 
   /** True when the field has ships and all of them are sunk. */
   public allShipsSunk(): boolean {
-    return this.ships.length > 0 && this.ships.every((ship) => ship.isSunk());
+    return this.ships.length > 0 && this.ships.every((ship: Ship): boolean => ship.isSunk());
   }
 
   // --- Read-only access for UI and tests ---
@@ -138,14 +154,14 @@ export class Field {
   private isValidPlacement(cells: readonly Coordinate[]): boolean {
     return (
       cells.length > 0 &&
-      cells.every((cell) => this.isInBounds(cell) && !this.hasAdjacentShip(cell))
+      cells.every((cell: Coordinate): boolean => this.isInBounds(cell) && !this.hasAdjacentShip(cell))
     );
   }
 
   /** True if the cell itself or any of its 8 neighbours holds a ship. */
   private hasAdjacentShip(coord: Coordinate): boolean {
     return [coord, ...this.getNeighbours(coord)].some(
-      (cell) => this.findShipAt(cell) !== undefined,
+      (cell: Coordinate): boolean => this.findShipAt(cell) !== undefined,
     );
   }
 
@@ -171,7 +187,7 @@ export class Field {
   }
 
   private findShipAt(coord: Coordinate): Ship | undefined {
-    return this.ships.find((ship) => ship.occupies(coord));
+    return this.ships.find((ship: Ship): boolean => ship.occupies(coord));
   }
 
   /** One attempt to place the whole fleet. Returns false if it got stuck. */

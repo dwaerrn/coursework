@@ -62,6 +62,28 @@ describe('Field: ship placement', () => {
     expect(field.isFleetComplete()).toBe(false);
   });
 
+  it('removes an untouched ship and frees its cells', () => {
+    const field = new Field();
+    field.placeShip(3, { row: 2, col: 2 }, H);
+    field.placeShip(1, { row: 9, col: 9 }, H);
+
+    expect(field.removeShipAt({ row: 2, col: 4 })).toBe(true);
+    expect(field.getShips()).toHaveLength(1);
+    expect(field.getCellState({ row: 2, col: 2 }, true)).toBe(CellState.Empty);
+    expect(field.getRemainingShipLengths()).toContain(3);
+    // The freed area can be used again, even right next to the old position.
+    expect(field.canPlaceShip(3, { row: 3, col: 2 }, H)).toBe(true);
+  });
+
+  it('does not remove water or a ship that was already hit', () => {
+    const field = new Field();
+    field.placeShip(2, { row: 0, col: 0 }, H);
+    expect(field.removeShipAt({ row: 5, col: 5 })).toBe(false);
+    field.receiveShot({ row: 0, col: 0 });
+    expect(field.removeShipAt({ row: 0, col: 1 })).toBe(false);
+    expect(field.getShips()).toHaveLength(1);
+  });
+
   it('clear() removes ships and shot marks', () => {
     const field = new Field();
     field.placeShip(2, { row: 0, col: 0 }, H);

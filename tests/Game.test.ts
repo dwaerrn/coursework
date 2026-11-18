@@ -43,6 +43,19 @@ describe('Game', () => {
     expect(game.placeHumanShip(5, { row: 4, col: 0 }, Orientation.Horizontal)).toBe(false);
   });
 
+  it('lets the human take a ship back only during setup', () => {
+    const game = new Game('Tester', {}, createSeededRandom(2));
+    game.placeHumanShip(4, { row: 0, col: 0 }, Orientation.Horizontal);
+    expect(game.removeHumanShip({ row: 0, col: 2 })).toBe(true);
+    expect(game.getHuman().field.getShips()).toHaveLength(0);
+    expect(game.removeHumanShip({ row: 0, col: 2 })).toBe(false);
+
+    game.randomizeHumanFleet();
+    game.start();
+    const ship = game.getHuman().field.getShips()[0];
+    expect(game.removeHumanShip(ship.start)).toBe(false);
+  });
+
   it('rejects shots outside the PLAYING state', () => {
     const game = new Game('Tester');
     expect(game.humanShoot({ row: 0, col: 0 })).toBeNull();
